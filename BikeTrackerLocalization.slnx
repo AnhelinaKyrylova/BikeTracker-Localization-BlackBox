@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BikeTracker.Analysis/BikeTracker.Analysis.csproj" />
+  <Project Path="BikeTracker.Core.Tests/BikeTracker.Core.Tests.csproj" />
+  <Project Path="BikeTracker.Core/BikeTracker.Core.csproj" />
+  <Project Path="BikeTracker/BikeTracker.csproj" />
+</Solution>
