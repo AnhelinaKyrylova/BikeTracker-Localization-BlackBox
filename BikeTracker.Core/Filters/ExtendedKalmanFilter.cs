@@ -13,8 +13,8 @@ namespace BikeTracker.Core.Filters
 
         private double _distance;
         private double _velocity;
-        // Kovariancna matica 2x2 (uchovana ako 4 cisla, aby vyhnut maticovej kniznici -
-        // dolezite pre pripadnu prenositelnost na nanoFramework)
+        // Kovariancna matica 2x2 (uchovana ako 4 cisla, aby vyhnut maticovej kniznici,
+        // dolezite pre prenositelnost na nanoFramework)
         private double _p00, _p01, _p10, _p11;
 
         private long _lastTimestampMs = -1;

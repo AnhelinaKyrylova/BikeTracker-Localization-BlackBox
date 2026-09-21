@@ -3,11 +3,10 @@ using BikeTracker.Core.Models;
 
 namespace BikeTracker.Core
 {
-    /// <summary>
-    /// Jediny verejny vstupny bod black boxu. Platformovy kod (MAUI app,
-    /// buduci embedded firmware) pozna len tuto triedu - nic o vnutornej
-    /// volbe alebo implementacii filtrov.
-    /// </summary>
+
+    /// Vstupny bod black boxu. Platformovy kod pozna len tuto triedu, 
+    /// nic o vnutornej volbe alebo implementacii filtrov.
+
     public class LocalizationBlackBox
     {
         private readonly ILocalizationFilter _filter;

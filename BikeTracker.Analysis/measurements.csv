@@ -1,26 +1,66 @@
-Cislo merania;Vzdialenost (m);RSSI (dBm);Prostredie;LOS/NLOS;Poznamka;Cas merania;;;;
-1;1;-58;vonku;LOS;test;14:00;;;;
-2;1;-61;vonku;LOS;test;14:01;;;;
-3;3;-67;vonku;LOS;test;14:05;;;;
-4;3;-70;vonku;LOS;test;14:06;;;;
-5;5;-74;vonku;LOS;test;14:10;;;;
-6;;;;;;;;;;
-7;;;;;;;;;;
-8;;;;;;;;;;
-9;;;;;;;;;;
-10;;;;;;;;;;
-11;;;;;;;;;;
-12;;;;;;;;;;
-13;;;;;;;;;;
-14;;;;;;;;;;
-15;;;;;;;;;;
-16;;;;;;;;;;
-17;;;;;;;;;;
-18;;;;;;;;;;
-19;;;;;;;;;;
-20;;;;;;;;;;
-21;;;;;;;;;;
-22;;;;;;;;;;
-23;;;;;;;;;;
-24;;;;;;;;;;
-25;;;;;;;;;;
+Cislo merania;Vzdialenost (m);RSSI (dBm);Prostredie;LOS/NLOS;Poznamka;Cas merania
+1;0;-22;vonku;NLOS;okolo budovy;15:53:00
+2;0;-21;vonku;NLOS;okolo budovy;14:01:00
+3;0;-24;vonku;NLOS;okolo budovy;14:05:00
+4;0;-22;vonku;NLOS;okolo budovy;14:06:00
+5;0;-20;vonku;NLOS;okolo budovy;14:06:04
+6;1;-40;vonku;LOS;otvorena miestnost;15:56:00
+7;1;-41;vonku;LOS;otvorena miestnost;15:56:01
+8;1;-39;vonku;LOS;otvorena miestnost;15:56:05
+9;1;-45;vonku;LOS;otvorena miestnost;15:56:12
+10;1;-46;vonku;LOS;otvorena miestnost;15:56:12
+11;1;-49;vonku;NLOS;okolo budovy;15:58:00
+12;1;-50;vonku;NLOS;okolo budovy;15:58:03
+13;1;-48;vonku;NLOS;okolo budovy;15:58:09
+14;1;-50;vonku;NLOS;okolo budovy;15:58:15
+15;1;-52;vonku;NLOS;okolo budovy;15:59:19
+16;2;-55;vonku;LOS;otvorena miestnost;16:00:00
+17;2;-56;vonku;LOS;otvorena miestnost;16:00:05
+18;2;-58;vonku;LOS;otvorena miestnost;16:00:14
+19;2;-55;vonku;LOS;otvorena miestnost;16:00:27
+20;2;-57;vonku;LOS;otvorena miestnost;16:00:31
+21;2;-54;vonku;NLOS;okolo budovy/bicykly;16:02:00
+22;2;-56;vonku;NLOS;okolo budovy/bicykly;16:02:11
+23;2;-58;vonku;NLOS;okolo budovy/bicykly;16:02:18
+24;2;-59;vonku;NLOS;okolo budovy/bicykly;16:02:23
+25;2;-56;vonku;NLOS;okolo budovy/bicykly;16:02:34
+26;3;-69;vonku;LOS;otvorena miestnost;16:04:23
+27;3;-72;vonku;LOS;otvorena miestnost;16:04:36
+28;3;-73;vonku;LOS;otvorena miestnost;16:04:40
+29;3;-74;vonku;LOS;otvorena miestnost;16:04:47
+30;3;-76;vonku;LOS;otvorena miestnost;16:05:01
+31;3;-49;vonku;NLOS;okolo budovy/bicykly/stena;16:14:09
+32;3;-50;vonku;NLOS;okolo budovy/bicykly/stena;16:14:16
+33;3;-51;vonku;NLOS;okolo budovy/bicykly/stena;16:14:22
+34;3;-52;vonku;NLOS;okolo budovy/bicykly/stena;16:14:34
+35;3;-58;vonku;NLOS;okolo budovy/bicykly/stena;16:14:51
+36;4;-77;vonku;LOS;otvorena miestnost;16:17:10
+37;4;-79;vonku;LOS;otvorena miestnost;16:17:16
+38;4;-72;vonku;LOS;otvorena miestnost;16:17:22
+39;4;-74;vonku;LOS;otvorena miestnost;16:17:35
+40;4;-75;vonku;LOS;otvorena miestnost;16:17:40
+41;4;-74;vonku;NLOS;okolo budovy;16:20:08
+42;4;-78;vonku;NLOS;okolo budovy;16:20:16
+43;4;-81;vonku;NLOS;okolo budovy;16:20:32
+44;4;-82;vonku;NLOS;okolo budovy;16:20:43
+45;4;-79;vonku;NLOS;okolo budovy;16:20:54
+46;5;-72;vonku;LOS;otvorena miestnost;16:22:20
+47;5;-74;vonku;LOS;otvorena miestnost;16:22:27
+48;5;-76;vonku;LOS;otvorena miestnost;16:22:32
+49;5;-79;vonku;LOS;otvorena miestnost;16:22:39
+50;5;-76;vonku;LOS;otvorena miestnost;16:22:46
+51;10;-78;vonku;LOS;otvorena miestnost;16:25:00
+52;10;-80;vonku;LOS;otvorena miestnost;16:25:10
+53;10;-82;vonku;LOS;otvorena miestnost;16:25:21
+54;10;-83;vonku;LOS;otvorena miestnost;16:25:26
+55;10;-81;vonku;LOS;otvorena miestnost;16:26:27
+56;15;-85;vonku;LOS;otvorena miestnost/sklon;16:27:10
+57;15;-84;vonku;LOS;otvorena miestnost/sklon;16:27:23
+58;15;-83;vonku;LOS;otvorena miestnost/sklon;16:28:04
+59;15;-90;vonku;LOS;otvorena miestnost/sklon;16:28:18
+60;15;-89;vonku;LOS;otvorena miestnost/sklon;16:28:40
+61;15;-87;vonku;LOS;otvorena miestnost/sklon;16:32:02
+62;15;-88;vonku;LOS;otvorena miestnost/sklon;16:33:07
+63;15;-86;vonku;LOS;otvorena miestnost/sklon;16:33:23
+64;15;-85;vonku;LOS;otvorena miestnost/sklon;16:33:37
+65;15;-92;vonku;LOS;otvorena miestnost/sklon;16:33:58

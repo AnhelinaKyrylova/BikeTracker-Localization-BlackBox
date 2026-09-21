@@ -66,14 +66,14 @@ namespace BikeTracker.Core.Filters
             if (dt <= 0) dt = 0.1;
             _lastTimestampMs = sample.TimestampMs;
 
-            // --- PREDICT: random walk s process noise umernym dt ---
+            // PREDICT: 
             for (int i = 0; i < _particleCount; i++)
             {
                 _particles[i] += NextGaussian() * _processNoiseStd * Math.Sqrt(dt);
                 if (_particles[i] < 0) _particles[i] = 0;
             }
 
-            // --- UPDATE: vahy podla pravdepodobnosti namerania daneho RSSI ---
+            // UPDATE: vahy podla pravdepodobnosti merania daneho RSSI
             double weightSum = 0;
             for (int i = 0; i < _particleCount; i++)
             {
@@ -87,19 +87,19 @@ namespace BikeTracker.Core.Filters
             for (int i = 0; i < _particleCount; i++)
                 _weights[i] /= weightSum;
 
-            // --- ESTIMATE: vahovany priemer ---
+            // ESTIMATE: vahovany priemer
             double estimatedDistance = 0;
             for (int i = 0; i < _particleCount; i++)
                 estimatedDistance += _particles[i] * _weights[i];
 
-            // --- Effective sample size (miera degeneracie -> confidence) ---
+            // Effective sample size
             double sumSquaredWeights = 0;
             for (int i = 0; i < _particleCount; i++)
                 sumSquaredWeights += _weights[i] * _weights[i];
             double effectiveSampleSize = 1.0 / sumSquaredWeights;
             double confidence = effectiveSampleSize / _particleCount;
 
-            // --- RESAMPLE (systematic resampling) ak degeneracia klesne pod polovicu ---
+            // RESAMPLE ak klesne pod polovicu
             if (effectiveSampleSize < _particleCount / 2.0)
             {
                 Resample();
@@ -137,7 +137,7 @@ namespace BikeTracker.Core.Filters
                 _weights[i] = 1.0 / _particleCount;
         }
 
-        // Box-Muller transformacia - generuje normalne rozdeleny sum z Random (ktory dava len uniformne)
+        // Box-Muller transformacia - generuje normalne rozdeleny sum z Random
         private double NextGaussian()
         {
             double u1 = 1.0 - _random.NextDouble();

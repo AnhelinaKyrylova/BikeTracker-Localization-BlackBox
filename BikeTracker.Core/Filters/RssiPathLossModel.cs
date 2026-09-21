@@ -2,15 +2,15 @@ using System;
 
 namespace BikeTracker.Core.Filters
 {
-    /// <summary>
+
     /// Spolocny meraci model: prevod RSSI - vzdialenost.
     /// Parametre (TxPower, PathLossExponent) su konfigurovatelne,
     /// aby sa dali neskor kalibrovat na realne namerane data z tagu.
-    /// </summary>
+
     public class RssiPathLossModel
     {
-        public double TxPower { get; set; } = -59;      // typicka hodnota RSSI @ 1m, treba kalibrovat
-        public double PathLossExponent { get; set; } = 2.5; // 2.0-2.5 open urban, 2.7-3.5 NLOS
+        public double TxPower { get; set; } = -47.6;      // typicka hodnota RSSI @ 1m, treba kalibrovat
+        public double PathLossExponent { get; set; } = 3.56; // 2.0-3.5 open urban, 2.7-4 NLOS
 
         // h(d) - ocakavane RSSI pri danej vzdialenosti
         public double PredictRssi(double distanceM)

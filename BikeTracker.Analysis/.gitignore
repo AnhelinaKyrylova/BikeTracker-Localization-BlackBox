@@ -1,0 +1,21 @@
+bin/
+obj/
+
+# Visual Studio / VS Code
+.vs/
+*.user
+*.suo
+
+# NuGet
+*.nuget.props
+*.nuget.targets
+
+# OS subory
+.DS_Store
+Thumbs.db
+
+# Testovacie vystupy
+TestResults/
+
+# Analysis vystupy 
+BikeTracker.Analysis/filter_comparison_output.csv

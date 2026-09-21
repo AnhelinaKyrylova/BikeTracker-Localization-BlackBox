@@ -2,11 +2,11 @@ using BikeTracker.Core.Interfaces;
 
 namespace BikeTracker.Core.Models
 {
-    /// <summary>
-    /// Konkretna, jednoducho vytvaratelna implementacia IDeviceCapabilities.
+
+    /// Vytvaratelna implementacia IDeviceCapabilities.
     /// Platformovy kod (MAUI, testy) len naplni tieto hodnoty podľa toho,
-    /// na com appka realne bezi.
-    /// </summary>
+    /// na com appka bude realne bezat.
+
     public class DeviceCapabilitiesProfile : IDeviceCapabilities
     {
         public ComputeTier Tier { get; set; }
@@ -24,7 +24,7 @@ namespace BikeTracker.Core.Models
         {
             Tier = ComputeTier.Low,
             HasFpu = false,
-            AvailableRamKb = 512 // radovo kB, typicke pre maly MCU
+            AvailableRamKb = 128 // radovo kB, typicke pre maly MCU
         };
     }
 }

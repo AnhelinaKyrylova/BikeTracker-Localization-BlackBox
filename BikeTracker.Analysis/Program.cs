@@ -16,7 +16,7 @@ namespace BikeTracker.Analysis
         public string Prostredie { get; set; } = "";
         public string LosNlos { get; set; } = "";
         public string Poznamka { get; set; } = "";
-        public TimeSpan? CasMerania { get; set; } // null, ak sa čas nepodarilo naparsovať
+        public TimeSpan? CasMerania { get; set; } // null, ak sa cas nepodarilo naparsovať
     }
 
     public class Program
@@ -38,13 +38,26 @@ namespace BikeTracker.Analysis
 
             var outputLines = new List<string> { "Vzdialenost_Skutocna;Cislo_Vzorky;RSSI;Delta_t_ms;EKF_Odhad;PF_Odhad" };
 
-            var model = new RssiPathLossModel { TxPower = -59, PathLossExponent = 2.5 };
+            // Kalibracia TxPower/PathLossExponent sa pocita automaticky metodou
+            // najmensich stvorcov priamo z nacitanych meraní (RssiCalibration.cs),
+            // takze sa vzdy odzrkadluje aktualny obsah measurements.csv bez
+            // potreby rucne prepisovat cisla v kode.
+            var calibration = RssiCalibration.Fit(rows);
+            Console.WriteLine(
+                $"Kalibracia: TxPower={calibration.TxPower:F2} dBm, " +
+                $"PathLossExponent={calibration.PathLossExponent:F3} " +
+                $"(z {calibration.SampleCount} vzoriek, bez 0 m).");
+
+            var model = new RssiPathLossModel
+            {
+                TxPower = calibration.TxPower,
+                PathLossExponent = calibration.PathLossExponent
+            };
 
             foreach (var group in groups)
             {
-                var ekf = new ExtendedKalmanFilter(model);
-                var pf = new ParticleFilter(model, particleCount: 500, randomSeed: 42);
-
+                var ekf = new ExtendedKalmanFilter(model, measurementNoise: 7.0);
+                var pf = new ParticleFilter(model, particleCount: 500, measurementNoiseStd: 7.0, randomSeed: 42);
                 var groupRows = group.OrderBy(r => r.CasMerania ?? TimeSpan.Zero).ToList();
 
                 long t = 0;
@@ -60,15 +73,15 @@ namespace BikeTracker.Analysis
                     if (row.CasMerania.HasValue && previousTime.HasValue)
                     {
                         deltaMs = (long)(row.CasMerania.Value - previousTime.Value).TotalMilliseconds;
-                        if (deltaMs <= 0) deltaMs = 500; // ochrana pri chybnom/duplicitnom čase
+                        if (deltaMs <= 0) deltaMs = 500; // ochrana pri chybnom/duplicitnom case
                     }
                     else if (row.CasMerania.HasValue)
                     {
-                        deltaMs = 0; // prvá vzorka v skupine
+                        deltaMs = 0; // prva vzorka v skupine
                     }
                     else
                     {
-                        deltaMs = 500; // čas sa nepodarilo naparsovať - fallback
+                        deltaMs = 500; // cas sa nepodarilo naparsovat - fallback
                         usedFallbackTiming = true;
                     }
 
@@ -93,11 +106,15 @@ namespace BikeTracker.Analysis
 
                 string timingNote = usedFallbackTiming ? " (POZOR: niektoré časy sa nepodarilo naparsovať, použitý fallback 500ms)" : "";
                 Console.WriteLine($"Vzdialenosť {group.Key}m: {groupRows.Count} vzoriek spracovaných.{timingNote}");
+
             }
 
             string outputPath = "filter_comparison_output.csv";
             File.WriteAllLines(outputPath, outputLines);
             Console.WriteLine($"Výsledky uložené do '{outputPath}'. Otvor v Exceli a vytvor graf.");
+            string excelPath = "BikeTracker_Merania_Analyza.xlsx";
+            ExcelReportGenerator.GenerateFromCsv(inputPath, outputPath, excelPath, calibration);
+            Console.WriteLine($"Excel report uložený do '{excelPath}'.");
         }
 
         private static List<MeasurementRow> ReadCsv(string path)
@@ -145,7 +162,7 @@ namespace BikeTracker.Analysis
 
         private static int ParseInt(string s) => int.Parse(s.Trim());
 
-        // Podporuje formáty "14:32", "14:32:05", "14:32:05.500"
+        // Podporuje formaty "14:32", "14:32:05", "14:32:05.500"
         private static TimeSpan? ParseTime(string s)
         {
             s = s.Trim();
@@ -158,7 +175,7 @@ namespace BikeTracker.Analysis
                     return result;
             }
 
-            // posledný pokus - všeobecné parsovanie
+            // posledny pokus 
             if (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var fallback))
                 return fallback;
 

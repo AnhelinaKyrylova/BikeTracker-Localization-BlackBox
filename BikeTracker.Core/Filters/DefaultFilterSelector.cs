@@ -2,11 +2,11 @@ using BikeTracker.Core.Interfaces;
 
 namespace BikeTracker.Core.Filters
 {
-    /// <summary>
-    /// Strategy/Factory: rozhoduje, ktory ILocalizationFilter sa nasadi,
-    /// na zaklade deklarovanych schopnosti zariadenia.
-    /// Toto je jadro bodu 3 zadania - skalovatelna voľba filtra.
-    /// </summary>
+
+    /// Strategy: rozhoduje, ktory ILocalizationFilter sa nasadi,
+    /// na zaklade schopnosti zariadenia.
+    /// Skalovatelna voľba filtra.
+  
     public class DefaultFilterSelector : IFilterSelector
     {
         private readonly RssiPathLossModel _sharedModel;
@@ -14,7 +14,7 @@ namespace BikeTracker.Core.Filters
         public DefaultFilterSelector(RssiPathLossModel sharedModel = null)
         {
             // Zdielany model garantuje, ze vsetky filtre pouzivaju rovnaku kalibraciu
-            // (TxPower, PathLossExponent) - dolezite pre porovnanie v bode 1.
+            // (TxPower, PathLossExponent).
             _sharedModel = sharedModel ?? new RssiPathLossModel();
         }
 
@@ -31,9 +31,7 @@ namespace BikeTracker.Core.Filters
                 return new ExtendedKalmanFilter(_sharedModel);
             }
 
-            // Low tier: rovnaky EKF, ale konzervativnejsie parametre sumu
-            // (menej doveruje jednotlivym meraniam, kedze MCU typicky nema priestor
-            // na sofistikovanejsie predspracovanie RSSI pred filtrom).
+            // Low tier: rovnaky EKF, ale menej doveruje jednotlivym meraniam
             return new ExtendedKalmanFilter(_sharedModel,
                 processNoiseDistance: 0.03,
                 processNoiseVelocity: 0.01,
