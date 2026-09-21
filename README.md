@@ -15,14 +15,26 @@
      path-loss modelu (metóda najmenších štvorcov)
 
 ## Cez Powershell start
+
+```
 cd BikeTracker.Core
+
 dotnet build
 
 cd ..\BikeTracker.Core.Tests
+
 dotnet test BikeTracker.Core.Tests\BikeTracker.Core.Tests.csproj -v n
 
 cd BikeTracker.Analysis
+
 dotnet run measurements.csv
+
+cd BikeTracker
+
+dotnet add package Plugin.BLE
+```
+
+
 
 ## Poznámka ku kalibrácii
 
