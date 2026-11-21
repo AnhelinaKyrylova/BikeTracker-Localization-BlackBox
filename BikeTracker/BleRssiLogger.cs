@@ -15,10 +15,15 @@ namespace BikeTracker;
 /// z etikety). Ciel sa rozpozna podla UUID ALEBO podla nazvu z paketu.
 ///
 /// Logger sa po prvom zhodnom pakete ZAMKNE na jedno zariadenie (podla device.Id).
-/// Pakety z inych zariadeni, ktore by mali rovnaky nazov/UUID (napr. dalsia doska
-/// "Calvin_E"), sa nezapisuju, len sa pocitaju v IgnoredTargetCount.
+/// Pakety z inych zariadeni, ktore by mali rovnaky nazov/UUID, sa nezapisuju,
+/// len sa pocitaju v IgnoredTargetCount.
 ///
-/// Format CSV: t_ms;unix_ms;rssi_dbm;distance_m;scenario;device_id
+/// Zaznam sa deli na SEGMENTY (suvisle useky s rovnakou vzdialenostou a scenarom).
+/// Novy segment zacina pri zmene vzdialenosti/scenara a po pokracovani z pauzy.
+/// Pocas pauzy sa nic nezapisuje (prekladanie zariadenia).
+///
+/// Format CSV:
+/// t_ms;unix_ms;rssi_dbm;distance_m;scenario;segment_id;seg_t_ms;phone_moving;compass_deg;device_id
 public sealed class BleRssiLogger
 {
     public const string TargetName = "Calvin_E";
@@ -36,11 +41,28 @@ public sealed class BleRssiLogger
     // zariadenie, na ktore sa logger zamkol (null = zatial ziadne)
     private Guid? _lockedDeviceId;
 
+    // stav senzorov telefonu (nastavuje sa cez SetPhoneState)
+    private double _compassDeg = double.NaN;
+    private bool _phoneMoving;
+
+    // segment = suvisly usek zaznamu
+    private int _segmentId;
+    private long _segmentStartMs;
+
+    private volatile bool _paused;
+
     /// Aktualna vzdialenost od zariadenia v metroch (zapisuje sa do kazdeho riadku).
     public string DistanceM { get; set; } = "";
 
-    /// Popis scenara (napr. LOS, stena, telo, kov).
+    /// Popis scenara, napr. "los+clovek".
     public string Scenario { get; set; } = "";
+
+    /// Pocas pauzy sa pakety nezapisuju.
+    public bool Paused
+    {
+        get => _paused;
+        set => _paused = value;
+    }
 
     public bool IsRunning { get; private set; }
 
@@ -50,8 +72,7 @@ public sealed class BleRssiLogger
     /// Pocet VSETKYCH prijatych paketov (z akychkolvek zariadeni) - diagnostika.
     public int TotalAdvertCount { get; private set; }
 
-    /// Pocet paketov, ktore splnaju kriteria ciela, ale prisli z ineho zariadenia
-    /// nez to, na ktore sa logger zamkol (ignorovane) - diagnostika.
+    /// Pocet paketov splnajucich kriteria ciela, ale z ineho zariadenia nez to, na ktore sa logger zamkol.
     public int IgnoredTargetCount { get; private set; }
 
     /// Nazov posledneho videneho zariadenia (aj necieloveho) - diagnostika.
@@ -60,13 +81,51 @@ public sealed class BleRssiLogger
     public int LastRssi { get; private set; }
     public string? FilePath { get; private set; }
 
+    /// Cislo aktualneho segmentu.
+    public int SegmentId
+    {
+        get { lock (_lock) { return _segmentId; } }
+    }
+
+    /// Poslednych 12 hex cifier ID zamknuteho zariadenia (zhoduje sa s MAC adresou), alebo "-".
+    public string LockedDeviceShort
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _lockedDeviceId == null ? "-" : _lockedDeviceId.Value.ToString("N").Substring(20);
+            }
+        }
+    }
+
+    /// Zacne novy segment (zmena vzdialenosti/scenara alebo pokracovanie po pauze).
+    public void StartNewSegment()
+    {
+        lock (_lock)
+        {
+            _segmentId++;
+            _segmentStartMs = _clock.ElapsedMilliseconds;
+        }
+    }
+
+    /// Nastavi aktualny stav senzorov telefonu (zapisuje sa do kazdeho riadku).
+    public void SetPhoneState(double compassDeg, bool moving)
+    {
+        lock (_lock)
+        {
+            _compassDeg = compassDeg;
+            _phoneMoving = moving;
+        }
+    }
+
     public Task StartAsync()
     {
         if (IsRunning) return Task.CompletedTask;
 
         FilePath = Path.Combine(FileSystem.AppDataDirectory, $"ble_log_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
         _writer = new StreamWriter(FilePath, false, new UTF8Encoding(false)) { AutoFlush = true };
-        _writer.WriteLine("t_ms;unix_ms;rssi_dbm;distance_m;scenario;device_id");
+        _writer.WriteLine("t_ms;unix_ms;rssi_dbm;distance_m;scenario;segment_id;seg_t_ms;phone_moving;compass_deg;device_id");
 
         SampleCount = 0;
         TotalAdvertCount = 0;
@@ -74,6 +133,9 @@ public sealed class BleRssiLogger
         LastSeenName = "";
         LastRssi = 0;
         _lockedDeviceId = null;
+        _paused = false;
+        _segmentId = 1;
+        _segmentStartMs = 0;
         _clock.Restart();
 
         _adapter.ScanMode = ScanMode.LowLatency;
@@ -127,6 +189,8 @@ public sealed class BleRssiLogger
         lock (_lock)
         {
             if (_writer == null) return;
+            if (_paused) return;
+            if (string.IsNullOrWhiteSpace(DistanceM)) return;
 
             // zamkni sa na prve zariadenie, ktore splna kriteria ciela;
             // dalsie zariadenia s rovnakym nazvom/UUID ignoruj
@@ -140,8 +204,15 @@ public sealed class BleRssiLogger
                 return;
             }
 
+            long segT = tMs - _segmentStartMs;
+            string compass = double.IsNaN(_compassDeg)
+                ? ""
+                : _compassDeg.ToString("F1", CultureInfo.InvariantCulture);
+
             _writer.WriteLine(string.Format(CultureInfo.InvariantCulture,
-                "{0};{1};{2};{3};{4};{5}", tMs, unixMs, rssi, DistanceM, Scenario, device.Id));
+                "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}",
+                tMs, unixMs, rssi, DistanceM, Scenario, _segmentId, segT,
+                _phoneMoving ? 1 : 0, compass, device.Id));
             SampleCount++;
             LastRssi = rssi;
         }

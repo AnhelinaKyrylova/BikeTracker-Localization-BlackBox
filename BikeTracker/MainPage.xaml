@@ -5,7 +5,7 @@
              Title="BLE logger">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="14">
+        <VerticalStackLayout Padding="20" Spacing="12">
 
             <Label Text="Zariadenie: Calvin_E (UUID 00360010-8888-8888-8888-777777777777)"
                    FontSize="13" />
@@ -13,15 +13,46 @@
             <Entry x:Name="DistanceEntry"
                    Placeholder="Vzdialenosť od zariadenia (m)"
                    Keyboard="Numeric"
-                   TextChanged="OnLabelChanged" />
+                   Completed="OnLabelChanged"
+                   Unfocused="OnLabelChanged" />
 
-            <Entry x:Name="ScenarioEntry"
-                   Placeholder="Scenár (napr. LOS, stena, telo, kov)"
-                   TextChanged="OnLabelChanged" />
+            <Label Text="Scenár (vyber všetko, čo platí):" FontSize="13" />
+
+            <FlexLayout Wrap="Wrap" JustifyContent="Start">
+                <HorizontalStackLayout Margin="0,0,14,0">
+                    <CheckBox x:Name="TagLos" CheckedChanged="OnTagChanged" />
+                    <Label Text="LOS" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Margin="0,0,14,0">
+                    <CheckBox x:Name="TagClovek" CheckedChanged="OnTagChanged" />
+                    <Label Text="človek" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Margin="0,0,14,0">
+                    <CheckBox x:Name="TagStena" CheckedChanged="OnTagChanged" />
+                    <Label Text="stena" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Margin="0,0,14,0">
+                    <CheckBox x:Name="TagKov" CheckedChanged="OnTagChanged" />
+                    <Label Text="kov" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Margin="0,0,14,0">
+                    <CheckBox x:Name="TagStol" CheckedChanged="OnTagChanged" />
+                    <Label Text="stôl" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Margin="0,0,14,0">
+                    <CheckBox x:Name="TagVonku" CheckedChanged="OnTagChanged" />
+                    <Label Text="vonku" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </FlexLayout>
 
             <Button x:Name="StartStopBtn"
                     Text="Štart záznamu"
                     Clicked="OnStartStopClicked" />
+
+            <Button x:Name="PauseBtn"
+                    Text="Pauza (presúvam zariadenie)"
+                    IsEnabled="False"
+                    Clicked="OnPauseClicked" />
 
             <Label x:Name="StatusLabel"
                    Text="Pripravené." />
