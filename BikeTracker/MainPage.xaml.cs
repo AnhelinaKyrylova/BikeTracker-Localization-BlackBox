@@ -47,7 +47,7 @@ public partial class MainPage : ContentPage
         return string.Join("+", tags);
     }
 
-    private void ApplyLabels()
+    private void ApplyLabels(bool newSegmentIfChanged = true)
     {
         string distance = (DistanceEntry.Text ?? "").Trim().Replace(',', '.').Replace(';', '_');
         string scenario = BuildScenario();
@@ -57,7 +57,7 @@ public partial class MainPage : ContentPage
         _logger.DistanceM = distance;
         _logger.Scenario = scenario;
 
-        if (changed && _logger.IsRunning)
+        if (newSegmentIfChanged && changed && _logger.IsRunning && !_logger.Paused)
             _logger.StartNewSegment();
     }
 
@@ -128,7 +128,7 @@ public partial class MainPage : ContentPage
         else
         {
             // po pauze mohlo zariadenie zmenit miesto: zober novu vzdialenost/scenar a zacni novy segment
-            ApplyLabels();
+            ApplyLabels(false);
             _logger.StartNewSegment();
             PauseBtn.Text = "Pauza (presúvam zariadenie)";
         }
@@ -186,5 +186,15 @@ public partial class MainPage : ContentPage
         {
             StatusLabel.Text = $"Chyba pri zdieľaní: {ex.Message}";
         }
+    }
+    private async void OnOpenLiveClicked(object? sender, EventArgs e)
+    {
+        if (_logger.IsRunning)
+        {
+            StatusLabel.Text = "Najprv zastav záznam, skenovanie nemôže bežať dvakrát.";
+            return;
+        }
+
+        await Navigation.PushAsync(new LivePage());
     }
 }

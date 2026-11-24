@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BikeTracker.LivePage"
+             Title="Živý režim (black box)">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
+
+            <Label x:Name="DistanceLabel" Text="- m" FontSize="44" HorizontalOptions="Center" />
+            <Label x:Name="DistanceInfoLabel" Text="" HorizontalOptions="Center" />
+            <Label x:Name="FilterLabel" Text="" FontSize="12" HorizontalOptions="Center" />
+
+            <Label x:Name="ArrowLabel" Text="▲" FontSize="96" HorizontalOptions="Center" Opacity="0.3" />
+            <Label x:Name="HeadingLabel" Text="Smer: zatiaľ nezmeraný" HorizontalOptions="Center" />
+
+            <Button x:Name="StartStopBtn" Text="Štart" Clicked="OnStartStopClicked" />
+            <Button x:Name="SweepBtn" Text="Zmerať smer (10 s otáčaj telefón dokola)"
+                    IsEnabled="False" Clicked="OnSweepClicked" />
+
+            <Label x:Name="StatusLabel" Text="Pripravené." />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

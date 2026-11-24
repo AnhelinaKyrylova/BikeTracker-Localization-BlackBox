@@ -10,7 +10,7 @@ namespace BikeTracker.Core.Filters
     /// merania zistit neda. Pouzivatel preto pomaly otoci telefonom o 360 stupnov
     /// a pocas toho sa zbieraju dvojice (kompasovy smer, RSSI). Smer, pri ktorom
     /// bolo RSSI najsilnejsie, je odhadom smeru k tagu.
- 
+
     /// Postup: kruh sa rozdeli na kose rovnakej sirky, v kazdom kosi sa drzi
     /// najsilnejsie RSSI a po sweepe sa vyberie najlepsi kos.
 
@@ -26,7 +26,7 @@ namespace BikeTracker.Core.Filters
         /// "binCount" Pocet kosov (36 = 10 stupnov na kos), minimum 4.
         /// O kolko dB musi byt najlepsi kos silnejsi nez priemer kosov, aby mala
         /// ostrost maxima plnu istotu (1.0).
-   
+
         public RssiHeadingEstimator(int binCount = 36, double peakSharpnessScaleDb = 8.0)
         {
             if (binCount < 4)
@@ -45,7 +45,7 @@ namespace BikeTracker.Core.Filters
                 _bestRssiPerBin[i] = null;
         }
 
-  
+
         /// Prida jednu vzorku zo sweepu.
         /// compassHeadingDeg je smer telefonu (0-360, 0 = sever),
         /// rssi je namerana hodnota v danom okamihu.
@@ -62,7 +62,9 @@ namespace BikeTracker.Core.Filters
 
         /// Vypocita odhad smeru zo vsetkych doterajsich vzoriek.
         /// Confidence = ostrost maxima x pokrytie kruhu (obe v rozsahu 0-1).
-  
+        /// Pokrytie = 1 - (najvacsi prazdny usek kruhu / 360), takze riedky, ale
+        /// rovnomerny sweep (malo paketov za sekundu) nie je trestany tak ako polovicny.
+
         public HeadingEstimate GetEstimate()
         {
             int filledBins = 0;
@@ -102,7 +104,7 @@ namespace BikeTracker.Core.Filters
             double sharpness = Clamp01((bestRssi - meanRssi) / _peakSharpnessScaleDb);
 
             // ak sweep nepokryl cely kruh, istota klesa
-            double coverage = (double)filledBins / _binCount;
+            double coverage = ComputeCoverage();
 
             return new HeadingEstimate
             {
@@ -111,6 +113,35 @@ namespace BikeTracker.Core.Filters
                 FilledBins = filledBins,
                 TotalBins = _binCount
             };
+        }
+
+        /// Pokrytie kruhu: 1 - (najvacsi suvisly prazdny usek / cely kruh).
+        /// Plny kruh = 1.0, jediny kos = 1 / binCount, polovicny sweep ~0.5.
+        private double ComputeCoverage()
+        {
+            int first = -1;
+            int previous = -1;
+            int largestEmpty = 0;
+
+            for (int i = 0; i < _binCount; i++)
+            {
+                if (_bestRssiPerBin[i] == null) continue;
+
+                if (first < 0)
+                    first = i;
+                else
+                    largestEmpty = Math.Max(largestEmpty, i - previous - 1);
+
+                previous = i;
+            }
+
+            if (first < 0) return 0;
+
+            // kruhovy uzatvarajuci usek: od posledneho vyplneneho kosa cez 360/0 k prvemu
+            int wrapEmpty = (first + _binCount) - previous - 1;
+            largestEmpty = Math.Max(largestEmpty, wrapEmpty);
+
+            return 1.0 - (double)largestEmpty / _binCount;
         }
 
         private int GetBinIndex(double headingDeg)

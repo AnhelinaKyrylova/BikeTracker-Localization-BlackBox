@@ -219,7 +219,7 @@ public sealed class BleRssiLogger
     }
 
     /// Nazov z reklamneho paketu (Complete/Shortened Local Name), inak nazov zo systemu.
-    private static string GetAdvertisedName(IDevice device)
+    internal static string GetAdvertisedName(IDevice device)
     {
         foreach (var record in device.AdvertisementRecords)
         {
@@ -235,7 +235,7 @@ public sealed class BleRssiLogger
     }
 
     /// Ciel = 128-bitove UUID sluzby zhoduje s TargetUuidHex, ALEBO nazov je "Calvin_E".
-    private static bool IsTarget(IDevice device, string advertisedName)
+    internal static bool IsTarget(IDevice device, string advertisedName)
     {
         if (advertisedName == TargetName) return true;
 
